@@ -1,3 +1,11 @@
+<?php
+	session_start(); 
+	//checking for session id or admin
+	if(!isset($_SESSION['role']) or ($_SESSION['role'] != 'user')){
+		header("location: login.php");
+		exit();
+	}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,8 +22,8 @@
     
     <div class="hero-image">
         <div class="hero-text">
-            <h1>Authentic Filipino <span style="color: #fc921b;">Lugaw</span> Experience</h1>
-            <p style="margin: 1.5rem 0rem;">Craving comfort food? Order our best-selling lugaw, mami, tokwa’t baboy, and more — freshly made and delivered to your doorstep.</p>
+            <h1 style="font-size: 4rem;">Warm Meals,<br>Big <span style="color: #fc921b;">Comfort</span>.</h1>
+            <p style="margin: 1.5rem 0;">Serving authentic Filipino-favorite kalye comfort foods delivered warm right at your doorstep. Craving comfort? Place an order now!</p>
             <a href="menu.php">
                 <button class="hero-btn1" style="margin-right: 15px;">Order Now</button>
             </a>
@@ -26,6 +34,8 @@
     </div>
 
     <main>
+        <?php include 'about.php'; ?>
+
         <section id="b-sell" class="home-s">
             <h2>Best Sellers</h2>
             

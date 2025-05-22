@@ -1,3 +1,4 @@
+    
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -79,12 +80,8 @@
                     </div>
                     
                     <div class="modal-footer">
-                        <form action="showcart.php" method="post">
-                            <button type="submit" >Show Cart</button>
-                        </form>
-                         <form action="addcart.php" method="post">
-                            <button type="submit">Add to Cart</button>
-                         </form>
+                        <button onclick="showCart()">Show Cart</button>
+                        <button onclick="addToCart()">Add to Cart</button>
                     </div>
                 </div>
             </div>

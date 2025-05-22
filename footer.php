@@ -30,8 +30,7 @@
         <!-- Hours -->
         <div class="footer-column">
             <h4>Hours</h4>
-            <p>Mon – Fri: 7:00 AM – 8:00 PM</p>
-            <p>Sat – Sun: 8:00 AM – 9:00 PM</p>
+            <p>We're Always Open – 24/7!</p>
         </div>
     </div>
 

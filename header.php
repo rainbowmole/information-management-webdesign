@@ -2,8 +2,9 @@
 
 <header style="padding: 15px 0;">
     <div class="header-div" style="padding-left: 3em;">
-        <a href="index.php">
+        <a href="index.php" class="brand-name" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
             <img src="media/logo.png" alt="JLougawan Logo" style="height: 55px;">
+            <span class="brand-name" style="font-size: 1.5em; font-weight: bold;">Kalye Co.</span>
         </a>
     </div>
 
@@ -16,7 +17,7 @@
                     echo '';
                 } elseif ($currentPage === 'index.php') {
                     echo '<a href="menu.php">Menu</a>';
-                    echo '<a href="about.php">About</a>';
+                    echo '<a href="#about">About</a>';
                     echo '<a href="contact.php">Contact</a>';
                 }
             ?>

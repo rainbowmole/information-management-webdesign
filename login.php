@@ -14,8 +14,8 @@
 					}
 
 					//validate password
-					if(!empty($_POST['psword'])){
-						$p = hash('sha256' , mysqli_real_escape_string($dbcon, $_POST['psword']));
+					if(!empty($_POST['password'])){
+						$p = hash('sha256' , mysqli_real_escape_string($dbcon, $_POST['password']));
 					}else{
 						$p = null;
 						echo '<p class="error">Password Required</p>';
@@ -23,7 +23,7 @@
 
 					if ($e && $p) {
 						// get user info from db; password hashing require
-						$q = "SELECT user_id, fname, user_level from users where (email = '$e' AND psword = '$p')";
+						$q = "SELECT user_id, firstname from users where (email = '$e' AND psword = '$p')";
 						$result = mysqli_query($dbcon, $q);
 						if(@mysqli_num_rows($result) == 1){ //kung isa lang na get
 							//start session
@@ -32,7 +32,7 @@
 							//sanity check
 							$_SESSION['user_level'] = (int) $_SESSION['user_level'];
 							//ternary operation
-							$url = ($_SESSION['user_level'] === 1) ? 'admin_page.php' : 'members_page.php';
+							$url = ($_SESSION['user_level'] === 1) ? 'admin.php' : 'index.php';
 							header('Location: '.$url);
 							exit();
 							mysqli_free_result($result);
@@ -50,15 +50,15 @@
 			?>
 			<div id="pop_login">
 				<h2>Login</h2>
-				<form action="login_page.php" method="post">
+				<form action="menu.php" method="post">
 					<p id="log_email"><label class="label" for="email">Email Address: </label>
 					<input type="text" id="pop_email" name="email" size="30" maxlength="50"
 					value="<?php  if(isset($_POST['email'])) echo $_POST['email'];?>">
 					</p>
 
-					<p id="log_psword"><label class="label" for="psword">Password: </label>
-					<input type="password" id="pop_psword" name="psword" size="20" maxlength="40"
-					value="<?php  if(isset($_POST['psword'])) echo $_POST['psword'];?>">
+					<p id="log_password"><label class="label" for="password">Password: </label>
+					<input type="password" id="pop_password" name="password" size="20" maxlength="40"
+					value="<?php  if(isset($_POST['password'])) echo $_POST['password'];?>">
 					</p>
 
 					<p><input type="submit" id="submit_login" name="login" value="login"></p>
