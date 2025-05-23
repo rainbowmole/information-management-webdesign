@@ -1,4 +1,3 @@
-    
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -15,8 +14,8 @@
             <h1>Menu</h1>
         
             <div class="menu-container">
-                
-                <div class="card" onclick="openModal('Lugaw w/ Egg', 'media/menu/lugaw-egg.jpg', 'Warm rice porridge with a soft-boiled egg.', 35)">
+                <!--openModal(base_food_id, 'add_ons', 'item name/title', 'file path', 'description', price)-->
+                <div class="card" onclick="openModal('Lugaw w/ Egg', 'media/menu/lugaw-egg.jpg', 'Warm rice porridge with a soft-boiled egg.', 35, 1, 'lugaw_addons')">
                     <img src="media/menu/lugaw-egg.jpg" alt="Lugaw w/ Egg" />
                     <div class="card-content">
                         <div class="card-title">Lugaw w/ Egg</div>
@@ -24,11 +23,27 @@
                     </div>
                 </div>
 
-                <div class="card" onclick="openModal('Pares', 'media/menu/beef-pares.jpg', 'Flavorful beef stew served with rice.', 50)">
+                <div class="card" onclick="openModal('Pares', 'media/menu/beef-pares.jpg', 'Flavorful beef stew served with rice.', 50, 2, 'pares_addons')">
                     <img src="media/menu/beef-pares.jpg" alt="Beef Pares"/>
                     <div class="card-content">
                         <div class="card-title">Pares</div>
                         <div class="card-price">₱50</div>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal('Lomi', 'media/menu/lomi.jpg', 'Flavorful beef stew served with rice.', 50, 3, 'lomi_addons')">
+                    <img src="media/menu/lomi.jpg" alt="Lomi"/>
+                    <div class="card-content">
+                        <div class="card-title">Lomi</div>
+                        <div class="card-price">₱50</div>
+                    </div>
+                </div>
+
+                <div class="card" onclick="openModal('Mami', 'media/menu/mami.jpg', 'Flavorful beef stew served with rice.', 35, 4, 'mami_addons')">
+                    <img src="media/menu/mami.jpg" alt="Mami"/>
+                    <div class="card-content">
+                        <div class="card-title">Mami</div>
+                        <div class="card-price">₱35</div>
                     </div>
                 </div>
 
@@ -42,7 +57,7 @@
                         <span id="modalTitle">Item Name</span>
                         <span class="close" onclick="closeModal()">❌</span>
                     </div>
-
+                    
                     <div class="modal-body">
                         <img id="modalImage" src="" alt="Item" />
                         <p id="modalDesc">Description here.</p>
@@ -59,29 +74,18 @@
                         <p>Add Ons:</p>
 
                         <div id="checklist" class="addons">
-                            <input type="checkbox" id="01" name="addons[]" value="Spring Onions (Free)">
-                            <label for="01">Add Spring Onions (Free)</label>
-
-                            <input type="checkbox" id="02" name="addons[]" value="Chili Garlic (Free)">
-                            <label for="02">Add Chili Garlic (Free)</label>
-
-                            <input type="checkbox" id="03" name="addons[]" value="Garlic chips (₱5)">
-                            <label for="03">Add garlic chips (₱5)</label>
-
-                            <input type="checkbox" id="04" name="addons[]" value="Extra egg (₱17)">
-                            <label for="04">Add extra egg (₱17)</label>
-
-                            <input type="checkbox" id="05" name="addons[]" value="Tokwa't Baboy (₱35)">
-                            <label for="05">Add Tokwa't Baboy (₱35)</label>
-
+                            <!-- for addons toh-->
                         </div>
-
 
                     </div>
                     
                     <div class="modal-footer">
-                        <button onclick="showCart()">Show Cart</button>
-                        <button onclick="addToCart()">Add to Cart</button>
+                        <form method="post" style="display:inline;">
+                            <button type="submit">Showcart</button>
+                        </form>
+                        <form action="add_to_cart.php" method="post" style="display:inline;">
+                            <button type="button" onclick="addToCart()">Add to Cart</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -124,7 +128,9 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button>Checkout</button>
+                        <form id="checkoutForm" method="post">
+                            <button type="submit">Checkout</button>
+                        </form>
                     </div>
                 </div>
             </div>

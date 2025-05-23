@@ -23,23 +23,33 @@
 
 					if ($e && $p) {
 						// get user info from db; password hashing require
-						$q = "SELECT user_id, firstname from users where (email = '$e' AND psword = '$p')";
+						$q = "SELECT user_id, firstname, 'user' AS role from users where email = '$e' AND password = '$p'";
 						$result = mysqli_query($dbcon, $q);
-						if(@mysqli_num_rows($result) == 1){ //kung isa lang na get
-							//start session
+
+						if($result && mysqli_num_rows($result) != 1){ //check lang if true
+							//for the admins
+							$q_admin = "SELECT admin_id, username, 'admin' from admin where email = '$e' and password = '$p'";
+							$result_admin = mysqli_query($dbcon, $q_admin);
+
+							if ($result_admin && mysqli_num_rows($result_admin) == 1){
+								//start session pagnahanap
+								session_start();
+								$_SESSION = mysqli_fetch_array($result_admin, MYSQLI_ASSOC);
+								mysqli_free_result($result_admin);
+								mysqli_close($dbcon);
+								header('Location: ap/admin.php');
+								exit();
+							}else{
+								echo'<p class="error">Incorrect email or password.</p>';
+							}
+						}else{
+							//user login na
 							session_start();
 							$_SESSION = mysqli_fetch_array($result, MYSQLI_ASSOC);
-							//sanity check
-							$_SESSION['user_level'] = (int) $_SESSION['user_level'];
-							//ternary operation
-							$url = ($_SESSION['user_level'] === 1) ? 'admin.php' : 'index.php';
-							header('Location: '.$url);
-							exit();
 							mysqli_free_result($result);
 							mysqli_close($dbcon);
-						}else{
-							//No result form db.
-							echo '<p class="error">User does not exist <br> register here </p>';
+							header('Location: index.php');
+							exit();
 						}
 					}else{
 						// problem 
@@ -50,7 +60,7 @@
 			?>
 			<div id="pop_login">
 				<h2>Login</h2>
-				<form action="menu.php" method="post">
+				<form action="" method="post">
 					<p id="log_email"><label class="label" for="email">Email Address: </label>
 					<input type="text" id="pop_email" name="email" size="30" maxlength="50"
 					value="<?php  if(isset($_POST['email'])) echo $_POST['email'];?>">
