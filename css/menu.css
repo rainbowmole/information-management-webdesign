@@ -1,0 +1,478 @@
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans&family=Lexend:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+body, html {
+    height: 100%;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff3e6;
+    color: #333;
+
+    background-image: url('../media/menu-bg.png'); /* adjust path */
+    background-size: cover;       /* scale image to cover entire area */
+    background-position: center;  /* center the image */
+    background-repeat: no-repeat; /* prevent tiling */
+    background-attachment: fixed;
+
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* dark transparent overlay */
+    z-index: -1;
+}
+
+main {
+    margin-top: 89px; 
+    padding: 0px 50px 50px 50px;
+    background-image: url(media/menu-bg.png);
+}
+
+main h1 {
+    margin: 0;
+    padding: 40px 0;
+    color: #FFF2C6;
+    font-size: 3rem;
+}
+
+@media (max-width: 480px) {
+  .menu-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 100%;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.card-price {
+    color: #fc921b;
+    margin-top: 5px;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; /* hidden by default */
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+/* When visible, apply flex display to center it */
+.modal.show {
+    display: flex !important;
+}
+
+.modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: #fc921b;
+    color: white;
+    padding: 15px 35px;
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 20px 35px;
+}
+
+.modal-body img {
+    object-fit: cover;
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.qty button {
+    padding: 5px 10px;
+    background-color: #fc921b;
+    border-radius: 25px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* ADD ONS STYLE ======================================= */
+.addons input[type="checkbox"],
+.addons label {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 4px 0;
+}
+#checklist {
+  --background: inherit;
+  --text: #414856;
+  --check: #fc921b;
+  --disabled: #c3c8de;
+  --width: fit-content;
+  --height: fit-content;
+  --border-radius: 10px;
+  background: var(--background);
+  width: var(--width);
+  height: var(--height);
+  position: relative;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 30px auto;
+  align-items: center;
+  justify-content: center;
+  row-gap: 5px;
+}
+
+#checklist label {
+  color: var(--text);
+  position: relative;
+  cursor: pointer;
+  display: grid;
+  align-items: center;
+  width: fit-content;
+  transition: color 0.3s ease;
+  margin: 0;
+  padding: 1px;
+}
+
+#checklist label::before, #checklist label::after {
+    content: "";
+    position: absolute;
+}
+
+#checklist label::before {
+    height: 2px;
+    width: 8px;
+    left: -27px;
+    background: var(--check);
+    border-radius: 2px;
+    transition: background 0.3s ease;
+}
+
+#checklist label:after {
+    height: 4px;
+    width: 4px;
+    top: 8px;
+    left: -25px;
+    border-radius: 50%;
+}
+
+#checklist input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  height: 15px;
+  width: 15px;
+  outline: none;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  background: var(--background);
+  display: grid;
+  align-items: center;
+  margin-right: 0;
+}
+
+#checklist input[type="checkbox"]::before, #checklist input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  top: auto;
+  background: var(--check);
+  border-radius: 2px;
+}
+
+#checklist input[type="checkbox"]::before {
+  width: 0px;
+  right: 60%;
+  transform-origin: right bottom;
+}
+
+#checklist input[type="checkbox"]::after {
+  width: 0px;
+  left: 40%;
+  transform-origin: left bottom;
+}
+
+#checklist input[type="checkbox"]:checked::before {
+  animation: check-01 0.4s ease forwards;
+}
+
+#checklist input[type="checkbox"]:checked::after {
+  animation: check-02 0.4s ease forwards;
+}
+
+#checklist input[type="checkbox"]:checked + label {
+  color: var(--disabled);
+  animation: move 0.3s ease 0.1s forwards;
+}
+
+#checklist input[type="checkbox"]:checked + label::before {
+  background: var(--disabled);
+  animation: slice 0.4s ease forwards;
+}
+
+#checklist input[type="checkbox"]:checked + label::after {
+  animation: firework 0.5s ease forwards 0.1s;
+}
+
+@keyframes move {
+  50% {
+    padding-left: 8px;
+    padding-right: 0px;
+  }
+
+  100% {
+    padding-right: 4px;
+  }
+}
+
+@keyframes slice {
+  60% {
+    width: 100%;
+    left: 4px;
+  }
+
+  100% {
+    width: 100%;
+    left: -2px;
+    padding-left: 0;
+  }
+}
+
+@keyframes check-01 {
+  0% {
+    width: 4px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  50% {
+    width: 0px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  51% {
+    width: 0px;
+    top: 8px;
+    transform: rotate(45deg);
+  }
+
+  100% {
+    width: 5px;
+    top: 8px;
+    transform: rotate(45deg);
+  }
+}
+
+@keyframes check-02 {
+  0% {
+    width: 4px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  50% {
+    width: 0px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  51% {
+    width: 0px;
+    top: 8px;
+    transform: rotate(-45deg);
+  }
+
+  100% {
+    width: 10px;
+    top: 8px;
+    transform: rotate(-45deg);
+  }
+}
+
+@keyframes firework {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 -2px #4f29f0, 0 0 0 -2px #4f29f0, 0 0 0 -2px #4f29f0, 0 0 0 -2px #4f29f0, 0 0 0 -2px #4f29f0, 0 0 0 -2px #4f29f0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    box-shadow: 0 -15px 0 0px #4f29f0, 14px -8px 0 0px #4f29f0, 14px 8px 0 0px #4f29f0, 0 15px 0 0px #4f29f0, -14px 8px 0 0px #4f29f0, -14px -8px 0 0px #4f29f0;
+  }
+}
+/* END OF ADD ONS STYLE ======================================= */
+
+.modal-footer {
+    padding: 15px 35px;
+    text-align: right;
+}
+
+.modal-footer button {
+    background-color: #fc921b;
+    border: none;
+    padding: 10px 20px;
+    margin: 0px 5px;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: "Montserrat", sans-serif;
+}
+
+.close {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+.notif-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+}
+
+.notif {
+  background-color: #fc921b;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.4s forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CART MODAL ================================ */
+/* Optional: style cart content slightly differently */
+.cart-content {
+    max-width: 600px;
+    width: 90%;
+    padding: 0;
+}
+
+/* Cart items styling */
+#cartItems {
+    padding: 20px 35px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.cart-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-weight: bold;
+}
+
+.cart-item-price {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+}
+
+/* END OF CART MODAL ================================ */
