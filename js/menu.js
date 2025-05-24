@@ -1,11 +1,11 @@
 let qty = 1;
 
 //changes on line 4 up to line 39
-function openModal(title, image, description, price, id, addonTable) {
+function openModal(title, image, description, price, id) { //refer to menu.php line 17 it gets the value of the item
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalImage').src = image;
     document.getElementById('modalDesc').innerText = description;
-    document.getElementById('modalPrice').innerText = price.toFixed(2);
+    document.getElementById('modalPrice').innerText = parseFloat(price).toFixed(2);
     document.getElementById('qtyValue').innerText = qty = 1;
     document.getElementById('itemModal').style.display = 'flex';
 
@@ -13,18 +13,20 @@ function openModal(title, image, description, price, id, addonTable) {
     checklist.innerHTML = 'Loading add-ons...';
 
     // Fetch dynamic add-ons from the same file
-    fetch(`fetch_addons.php?basefood_id=${id}&table=${addonTable}`)
+    fetch(`fetch_addons.php?basefood_id=${id}`) //the basefood_id == id(refer to line4) and table == addonTable(refer to line 4) this will pass on fetch_addons.php
         .then(res => {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             return res.json();
         })
         .then(data => {
+            console.log("receive data:", data);
             checklist.innerHTML = '';
+
             if (data.length === 0) {
-            checklist.innerHTML = '<em>No add-ons available</em>';
-            return;
+                checklist.innerHTML = '<em>No add-ons available</em>';
+                return;
             }
-            data.forEach(addon => {
+            data.forEach(addon => { //remember the addon list in line 19 of fetch_addons.php, this is to iterate each one of them as a list of checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `addon${addon.id}`;
@@ -34,7 +36,7 @@ function openModal(title, image, description, price, id, addonTable) {
                 const label = document.createElement('label');
                 label.htmlFor = `addon${addon.id}`;
                 label.textContent = `Add ${addon.name} ${addon.price == 0 ? '(free)' : `(₱${addon.price})`}`;
-
+                
                 checklist.appendChild(checkbox);
                 checklist.appendChild(label);
             });
@@ -99,21 +101,13 @@ function addToCart() {
         return raw.replace(/^Add\s+/i, '').trim();
     });
 
-    const addonPrices = {
-        "01": 0,   // Spring Onions
-        "02": 0,   // Chili Garlic
-        "03": 5,   // Garlic Chips
-        "04": 17,  // Extra Egg
-        "05": 35   // Tokwa't Baboy
-    }; 
-
-
-    const addonTotal = selectedAddons.reduce((sum, addon) => {
-        return sum + (addonPrices[addon.id] || 0);
+    const addonTotal = selectedAddons.reduce((sum, addon) =>{
+        const addonID = addon.id;
+        return sum + (addonPriceMap.get(addonID) || 0);
     }, 0);
 
-    const item = document.createElement('div');
-    item.className = 'cart-item';
+    const item = document.createElement('div')
+    item.classname = 'cart-item';
 
     item.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">

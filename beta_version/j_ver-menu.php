@@ -1,10 +1,56 @@
+<?php
+include 'mysqli_connect.php';
+
+$category = $_GET['category'] ?? 'base_foods'; //sets base foods as default page if hindi addons or bevs ang linked
+
+function renderCards($result, $category) {
+    while ($row = $result->fetch_assoc()) {
+        // Dynamically determine the ID field based on category
+        if ($category === 'addons') {
+            $id = $row['addon_id'];
+        } elseif ($category === 'beverages') {
+            $id = $row['beverage_id'];
+        } else {
+            $id = $row['basefood_id'];
+        }
+
+        echo '<div class="card" onclick="openModal(' .
+            htmlspecialchars(json_encode($row['name'])) . ',' .
+            htmlspecialchars(json_encode($row['image_url'])) . ',' .
+            htmlspecialchars(json_encode($row['description'] ?? '')) . ',' .
+            htmlspecialchars(json_encode($row['price'])) . ',' .
+            htmlspecialchars(json_encode($category)) . ',' .
+            htmlspecialchars(json_encode($id)) .
+        ')">';
+
+        echo '<img src="' . htmlspecialchars($row['image_url']) . '" alt="' . htmlspecialchars($row['name']) . '">';
+        echo '<div class="card-content">';
+        echo '<div class="card-title">' . htmlspecialchars($row['name']) . '</div>';
+        echo '<div class="card-price">₱' . $row['price'] . '</div>';
+        echo '</div></div>';
+    }
+}
+
+switch ($category) {
+    case 'addons':
+        $query = "SELECT a.addon_id, a.name, a.price, a.image_url FROM addons a JOIN (SELECT MIN(addon_id) AS min_id FROM addons WHERE price != 0.00 GROUP BY name) AS b ON a.addon_id = b.min_id;"; // display lang yung mga items by itself
+        break;
+    case 'beverages':
+        $query = "SELECT * FROM beverages WHERE is_available = 1";
+        break;
+    default:
+        $query = "SELECT * FROM base_foods WHERE is_available = 1";
+        break;
+}
+
+$result = $dbcon->query($query);
+?>
+
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Kalye Co. - Menu</title>
+        <title>JLougawan - Menu</title>
         <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="css/header.css">
     </head>
@@ -12,19 +58,26 @@
         <?php include 'header.php'; ?>
         <main>
             <h1>Menu</h1>
-        
-            <div class="menu-container">
-                <?php include 'render_menu_items.php'; ?> <!-- Cleaner ver To render menu items Dynamically -->
+
+            <!-- Category Filter -->
+            <nav class="menu-nav">
+                <button onclick="location.href='menu.php?category=base_foods'">Base Foods</button>
+                <button onclick="location.href='menu.php?category=addons'">Add-ons</button>
+                <button onclick="location.href='menu.php?category=beverages'">Beverages</button>
+            </nav>
+
+            <div class="menu-container" id="menuContainer">
+                <?php renderCards($result, $category); ?>
             </div>
 
-            <!-- Dynamic Modal| For design purposes -->
+            <!-- Modal -->
             <div class="modal" id="itemModal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <span id="modalTitle">Item Name</span>
                         <span class="close" onclick="closeModal()">❌</span>
                     </div>
-                    
+
                     <div class="modal-body">
                         <img id="modalImage" src="" alt="Item" />
                         <p id="modalDesc">Description here.</p>
@@ -39,19 +92,13 @@
 
                         <hr style="border: none; height: 2px; background-color: #ccc; margin: 20px 0;">
                         <p>Add Ons:</p>
-
                         <div id="checklist" class="addons">
-                            <!-- for addons toh-->
                         </div>
                     </div>
-        
+                    
                     <div class="modal-footer">
-                        <form method="post" style="display:inline;">
-                            <button type="button" onclick="showCart()">Show Cart</button>
-                        </form>
-                        <form action="add_to_cart.php" method="post" style="display:inline;">
-                            <button type="button" onclick="addToCart()">Add to Cart</button>
-                        </form>
+                        <button onclick="showCart()">Show Cart</button>
+                        <button onclick="addToCart()">Add to Cart</button>
                     </div>
                 </div>
             </div>
@@ -94,9 +141,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <form id="checkoutForm" method="post">
-                            <button type="submit">Checkout</button>
-                        </form>
+                        <button>Checkout</button>
                     </div>
                 </div>
             </div>
