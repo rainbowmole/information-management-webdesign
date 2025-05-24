@@ -5,7 +5,6 @@ include 'mysqli_connect.php';
 function renderCards($result) {
     while ($row = $result->fetch_assoc()) {
         $id = $row['basefood_id'];
-        $category = '';
 
         echo '<div class="card" onclick="openModal(' .
             htmlspecialchars(json_encode($row['name'])) . ',' .
