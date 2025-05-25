@@ -12,6 +12,13 @@
         <?php include 'header.php'; ?>
         <main>
             <h1>Menu</h1>
+            
+            <!-- To render the different types of menu items we have per category -->
+            <nav class="menu-nav">
+                <button onclick="location.href='menu.php?id=basefood_id'">Main Dishes</button> 
+                <button onclick="location.href='menu.php?id=addon_id'">Side Dishes</button>
+                <button onclick="location.href='menu.php?id=beverage_id'">Beverages</button>
+            </nav>
         
             <div class="menu-container">
                 <?php include 'render_menu_items.php'; ?> <!-- Cleaner ver To render menu items Dynamically -->
@@ -49,7 +56,7 @@
                         <form method="post" style="display:inline;">
                             <button type="button" onclick="showCart()">Show Cart</button>
                         </form>
-                        <form action="add_to_cart.php" method="post" style="display:inline;">
+                        <form action="addcart.php" method="post" style="display:inline;">
                             <button type="button" onclick="addToCart()">Add to Cart</button>
                         </form>
                     </div>
@@ -81,7 +88,7 @@
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>Shipping</span>
-                            <span>₱50.00</span>
+                            <span id="shippingFee">₱0.00</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>VAT (12%)</span>

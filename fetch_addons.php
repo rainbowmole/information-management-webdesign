@@ -15,7 +15,7 @@ if ($result) {
         $addons[] = [
             'id' => $row['addon_id'], // make sure this matches your column name
             'name' => $row['name'],
-            'price' => $row['price']
+            'price' => floatval($row['price'])
         ];
     }
 }

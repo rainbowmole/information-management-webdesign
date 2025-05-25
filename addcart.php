@@ -1,13 +1,14 @@
 <?php
-session_start(); 
-//checking for session id or admin
-if(!isset($_SESSION['role']) or ($_SESSION['role'] != 'user')){
-	header("location: login.php");
-	exit();
-}
+	session_start(); 
+	//checking for session id or admin
+	if(!isset($_SESSION['role']) || ($_SESSION['role'] != 'user')){
+		header("location: login.php");
+		exit();
+	}
 
 require('mysqli_connect.php');
 
+$user_id = $_SESSION['user_id'];
 $food_id = $_POST['food_id'];
 $quantity = $_POST['quantity'];
 

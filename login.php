@@ -27,14 +27,17 @@
 						$result = mysqli_query($dbcon, $q);
 
 						if($result && mysqli_num_rows($result) != 1){ //check lang if true
-							//for the admins
+							//checkng for the admins
 							$q_admin = "SELECT admin_id, username, 'admin' from admin where email = '$e' and password = '$p'";
 							$result_admin = mysqli_query($dbcon, $q_admin);
 
 							if ($result_admin && mysqli_num_rows($result_admin) == 1){
-								//start session pagnahanap
+								//start admin session pagnahanap
+								$admin_data = mysqli_fetch_array($result_admin, MYSQLI_ASSOC);
 								session_start();
-								$_SESSION = mysqli_fetch_array($result_admin, MYSQLI_ASSOC);
+								$_SESSION['admin_id'] = $admin_data['admin_id'];
+								$_SESSION['username'] = $admin_data['username'];
+								$_SESSION['role'] = 'admin';
 								mysqli_free_result($result_admin);
 								mysqli_close($dbcon);
 								header('Location: ap/admin.php');
@@ -44,8 +47,11 @@
 							}
 						}else{
 							//user login na
+							$user_data = mysqli_fetch_array($result, MYSQLI_ASSOC);
 							session_start();
-							$_SESSION = mysqli_fetch_array($result, MYSQLI_ASSOC);
+							$_SESSION['user_id'] = $user_data['user_id'];
+							$_SESSION['firstname'] = $user_data['firstname'];
+							$_SESSION['role'] = 'user';
 							mysqli_free_result($result);
 							mysqli_close($dbcon);
 							header('Location: index.php');
