@@ -1,11 +1,9 @@
 let qty = 1;
 let addonPriceMap = new Map();
 let dynamicShippingFee = 0;
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-function openModal(title, image, description, price, id, category_id) { 
-    document.getElementById('modalId').value = id;
-    document.getElementById('modalCategoryId').value = category_id;
+//changes on line 4 up to line 39
+function openModal(title, image, description, price, id, type) { //refer to menu.php line 17 it gets the value of the item
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalImage').src = image;
     document.getElementById('modalDesc').innerText = description;
@@ -16,13 +14,11 @@ function openModal(title, image, description, price, id, category_id) {
     const checklist = document.getElementById('checklist');
     checklist.innerHTML = '<em style="white-space: nowrap;">No add-ons available</em>';
 
-    console.log('category_id:', category_id, typeof category_id);
-
     // Fetch dynamic add-ons from the same file
-    if (category_id === 1) {
+    if (type === 'basefood') {
         checklist.innerHTML = 'Loading add-ons...';
 
-        fetch(`fetch_addons.php?category_id=${category_id}&basefood_id=${id}`) 
+        fetch(`fetch_addons.php?basefood_id=${id}`) //the basefood_id == id(refer to line4) and table == addonTable(refer to line 4) this will pass on fetch_addons.php
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
@@ -38,7 +34,7 @@ function openModal(title, image, description, price, id, category_id) {
 
                 addonPriceMap.clear();
 
-                data.forEach(addon => { 
+                data.forEach(addon => { //remember the addon list in line 19 of fetch_addons.php, this is to iterate each one of them as a list of checkbox
                     addonPriceMap.set(`addon${addon.id}`, addon.price);
 
                     const checkbox = document.createElement('input');
@@ -74,6 +70,11 @@ function changeQty(amount) {
 // CART MODAL
 const cartBtn = document.getElementById("cartBtn");
 const cartModal = document.getElementById("cartModal");
+
+//added
+window.addEventListener('load', function () {
+    localStorage.removeItem('cart'); // or clear all with localStorage.clear();
+});
 
 if (cartBtn) {
     cartBtn.addEventListener("click", showCart);
@@ -119,74 +120,77 @@ function addToCart() {
     const emptyText = cartItems.querySelector('p');
     if (emptyText) emptyText.remove();
 
-    const id = parseInt(document.getElementById('modalId').value);
-    const category_id = parseInt(document.getElementById('modalCategoryId').value); // ✅ Fix category ID
-    const name = document.getElementById('modalTitle').innerText;
-    const price = parseFloat(document.getElementById('modalPrice').innerText);
-    const quantity = parseInt(document.getElementById('qtyValue').innerText);
+    const name = document.getElementById('modalName').textContent.trim();
+    const price = parseFloat(document.getElementById('modalPrice').textContent);
+    const quantity = parseInt(document.getElementById('modalQuantity').value) || 1;
     const image = document.getElementById('modalImage').src;
 
-    const selectedAddons = Array.from(document.querySelectorAll('.addons input:checked'));
-    const addonNames = selectedAddons.map(a => {
-        const label = document.querySelector(`label[for="${a.id}"]`);
-        const raw = label ? label.textContent.trim() : '';
-        return raw.replace(/^Add\s+/i, '').trim();
+    // Assuming you have hidden inputs or data attributes on modal with id and type:
+    const itemId = parseInt(document.getElementById('modalId').value); // the product ID
+    const itemType = document.getElementById('modalType').value; // 'basefood' or 'beverage'
+
+    const selectedAddons = Array.from(document.querySelectorAll('.addon:checked')).map(addon => {
+        return {
+            id: parseInt(addon.dataset.id),
+            name: addon.dataset.name,
+            price: parseFloat(addon.dataset.price),
+            quantity: 1 // Or allow user to set quantity per addon
+        };
     });
 
-    const addonTotal = selectedAddons.reduce((sum, addon) => {
-        const addonID = addon.id;
-        return sum + (addonPriceMap.get(addonID) || 0);
-    }, 0);
+    const addonTotal = selectedAddons.reduce((total, addon) => total + addon.price * addon.quantity, 0);
+    const addonNames = selectedAddons.map(addon => `${addon.name} (₱${addon.price})`);
 
-    const item = document.createElement('div');
-    item.className = 'cart-item';
+    const cartItem = {
+        id: itemId,
+        type: itemType, // 'basefood' or 'beverage'
+        name,
+        image,
+        price,
+        qty: quantity,
+        addons: selectedAddons,
+        addonsText: addonNames.length ? `Add-ons: ${addonNames.join(', ')}` : ''
+    };
 
-    item.dataset.id = id; // ✅ Save ID for localStorage
-    item.dataset.price = price;
-    item.dataset.qty = quantity;
-    item.dataset.addon = addonTotal;
-    item.dataset.categoryId = category_id; // ✅ Set fixed category ID
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.push(cartItem);
+    localStorage.setItem('cart', JSON.stringify(cart));
 
-    item.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
-            <div style="flex: 1;">
-                <div><strong>${name}</strong></div>
-                ${addonNames.length ? `<div style="font-size: 0.9em; color: #555;">Add-ons: ${addonNames.join(', ')}</div>` : ''}
-            </div>
-            <button onclick="this.parentElement.parentElement.remove(); updateCartTotal()" style="background: none; border: none; color: red; cursor: pointer;">✖</button>
-        </div>
-    `;
+    // Save to localStorage: include id, type, and map keys properly
+    saveCartToLocalStorage(currentItemId, currentItemType, name, image, price, quantity, addonTotal, selectedAddons, addonNames);
 
-    cartItems.appendChild(item);
-    updateCartTotal();
-
+    // Show notification
     const notifContainer = document.getElementById('notifContainer');
     const notif = document.createElement('div');
     notif.className = 'notif';
     notif.innerText = '✅ Item added to cart!';
     notifContainer.appendChild(notif);
 
-    saveCartToLocalStorage();
-
     setTimeout(() => {
         notif.remove();
     }, 4000);
 }
 //to save the cart items across the pages
-function saveCartToLocalStorage() {
-    const cartItems = Array.from(document.querySelectorAll('.cart-item')).map(item => ({
-        id: parseInt(item.dataset.id), // ✅ Fixed line
-        name: item.querySelector('strong').innerText,
-        image: item.querySelector('img').src,
-        price: parseFloat(item.dataset.price),
-        qty: parseInt(item.dataset.qty),
-        addon: parseFloat(item.dataset.addon),
-        category_id: parseInt(item.dataset.categoryId),
-        addonsText: item.querySelector('div:nth-child(2) div:nth-child(2)')?.innerText || ''
-    }));
+// Update saveCartToLocalStorage to accept the parameters and include id and type
+function saveCartToLocalStorage(currentItemId, currentItemType, name, image, price, quantity, addonTotal, selectedAddons, addonNames) {
+    // Get existing cart or empty array
+    const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    // Add new item
+    existingCart.push({
+        id: currentItemId,
+        type: currentItemType,
+        name: name,
+        image: image,
+        price: price,
+        qty: quantity,
+        addon: addonTotal,
+        addonsText: addonNames.length ? `Add-ons: ${addonNames.join(', ')}` : '',
+        addons: selectedAddons
+    });
+
+    localStorage.setItem('cart', JSON.stringify(existingCart));
+    toggleCheckoutButton();
 }
 
 function updateCartTotal() {
@@ -222,8 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'cart-item';
-            el.dataset.id = item.id;               // ADD THIS
-            el.dataset.categoryId = item.category_id; // ADD THIS
             el.dataset.price = item.price;
             el.dataset.qty = item.qty;
             el.dataset.addon = item.addon;
@@ -277,8 +279,61 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartTotal();
     }
 });
+//added this shii
+function prepareCartForCheckout() {
+    const rawCart = JSON.parse(localStorage.getItem('cart')) || [];
+    return rawCart.map(item => {
+        const addons = (item.addons || []).map(addon => ({
+            id: addon.addon_id,      // map addon_id -> id
+            quantity: 1,             // default 1, change if you support addon qty
+            price: addon.price
+        }));
 
-//PANCHECK OUTT
+        return {
+            type: item.type || 'basefood',
+            id: item.id || 0,
+            quantity: item.qty || 1,
+            price: item.price || 0,
+            addons: addons
+        };
+    });
+}
+
+//CHECKOUT HANDLER GUYS
+//temporary update lang this //para sa pop up notification pag successfull na naka order user
+function handleCheckOut(event) {
+    event.preventDefault();  // STOP normal form submit (page reload)
+
+    const formData = new FormData(event.target);
+
+    // Get total from cart display
+    const totalText = document.getElementById('cartTotal').innerText;
+    const totalAmount = parseFloat(totalText.replace('₱', ''));
+
+    formData.append('total_amount', totalAmount);
+
+    fetch('checkout.php', {
+        method: 'POST',
+        body: new URLSearchParams(new FormData(event.target))
+    })
+    .then(res => res.text())
+    .then(data => {
+        const notifContainer = document.getElementById('notifContainer');
+        const notif = document.createElement('div');
+        notif.className = 'notif';
+        notif.innerText = '✅ Order placed successfully!';
+        notifContainer.appendChild(notif);
+
+        setTimeout(() => notif.remove(), 4000);
+
+        // clear cart UI & close modal if you have these functions
+        document.getElementById('cartItems').innerHTML = '<p>Your cart is empty.</p>';
+        updateCartTotal();
+        closeCart();
+    })
+    .catch(() => alert('Checkout failed.'));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('checkoutForm');
     if (form) {
@@ -286,36 +341,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.getElementById('checkoutForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // prevent form from submitting normally
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-    const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
-    const subtotal = parseFloat(document.getElementById('cartSubtotal').innerText.replace('₱', '')) || 0;
-    const vat = parseFloat(document.getElementById('cartVAT').innerText.replace('₱', '')) || 0;
-    const shipping = parseFloat(document.getElementById('shippingFee').innerText.replace('₱', '')) || 0;
-    const total = subtotal + vat + shipping;
+    const cart = prepareCartForCheckout();
+
+    if (cart.length === 0) {
+        const notifContainer = document.getElementById('notifContainer');
+        const notif = document.createElement('div');
+        notif.className = 'notif';
+        notif.innerText = '❌ Your cart is empty.';
+        notifContainer.appendChild(notif);
+        setTimeout(() => notif.remove(), 4000);
+        return;
+    }
 
     fetch('checkout.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            cart: cartData,
-            total_amount: total
-        })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cart: cart })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert('Order placed successfully! Order ID: ' + data.order_id);
-            localStorage.removeItem('cart');
-            location.reload(); // or redirect to success page
+            alert("Order placed successfully!");
+            localStorage.clear(); // Clear cart
+            renderCart(); // Refresh cart UI if you have this
+            document.getElementById('cartItems').innerHTML = '<p>Your cart is empty.</p>';
+            updateCartTotal();
+            closeCart();
         } else {
-            console.error(data.error || 'Unknown error');
-            alert('Checkout failed: ' + (data.error || 'Unknown error'));
+            alert("Error placing order: " + (data.error || 'Unknown error'));
         }
     })
-    .catch(err => {
-        console.error('Checkout error:', err);
-        alert('Checkout failed due to a network error.');
+    .catch(error => {
+        console.error("Checkout failed:", error);
+        alert("An error occurred.");
     });
 });

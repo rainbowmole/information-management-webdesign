@@ -1,0 +1,38 @@
+Array
+(
+    [0] => Array
+        (
+            [name] => Lugaw
+            [image] => http://localhost/Kalye-Co./null
+            [price] => 20
+            [qty] => 1
+            [addon] => 32
+            [category_id] => 
+            [addonsText] => Lugaw
+Lugaw Lugaw Add-ons: Egg (₱17), Tokwa (₱15)
+        )
+
+    [1] => Array
+        (
+            [name] => Lumpiang Toge
+            [image] => http://localhost/Kalye-Co./menu.php?id=addon_id
+            [price] => 10
+            [qty] => 1
+            [addon] => 0
+            [category_id] => 
+            [addonsText] => Lumpiang Toge
+Lumpiang Toge
+        )
+
+    [2] => Array
+        (
+            [name] => Bottled Water
+            [image] => http://localhost/Kalye-Co./null
+            [price] => 15
+            [qty] => 1
+            [addon] => 0
+            [category_id] => 3
+            [addonsText] => Bottled Water
+        )
+
+)

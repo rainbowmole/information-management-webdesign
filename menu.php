@@ -33,6 +33,8 @@
                     </div>
                     
                     <div class="modal-body">
+                        <input type="hidden" id="modalId" />
+                        <input type="hidden" id="modalCategoryId"/>
                         <img id="modalImage" src="" alt="Item" />
                         <p id="modalDesc">Description here.</p>
                         <p><strong>Price: ₱<span id="modalPrice">0</span></strong></p>

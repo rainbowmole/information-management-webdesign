@@ -1,90 +1,85 @@
 <?php
-// checkout.php
 session_start();
+error_log("Order processing started at " . date('Y-m-d H:i:s') . " for user: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'none'));
+header('Content-Type: application/json');
+require 'mysqli_connect.php'; // your connection file
 
-// Check if user is logged in and has the role 'user'
-if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'user') {
-    echo "<script>alert('You must be logged in as a user to proceed with checkout.'); window.location.href='login.php';</script>";
-    exit();
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input || !isset($input['cart']) || !isset($input['total_amount'])) {
+    echo json_encode(['success' => false, 'error' => 'Invalid input']);
+    exit;
 }
 
-include('mysqli_connect.php');
-
-$user_id = $_SESSION['user_id']; // Must be set from login session
-$payment_method = 'Cash on Delivery'; // You can also fetch this from $_POST
-
-// 1. Check if cart is empty
-$cart_check_sql = "SELECT COUNT(*) AS item_count FROM cart WHERE user_id = ?";
-$cart_check_stmt = mysqli_prepare($dbcon, $cart_check_sql);
-mysqli_stmt_bind_param($cart_check_stmt, "i", $user_id);
-mysqli_stmt_execute($cart_check_stmt);
-$cart_check_result = mysqli_stmt_get_result($cart_check_stmt);
-$cart_row = mysqli_fetch_assoc($cart_check_result);
-
-if ($cart_row['item_count'] == 0) {
-    echo "<script>alert('Your cart is empty. Please add items before checking out.'); window.location.href='menu.php';</script>";
-    exit();
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+if ($userId === null) {
+    echo json_encode(['success' => false, 'error' => 'User not logged in']);
+    exit;
 }
 
-// 2. Calculate total price (basefood × quantity + addon + beverage)
-$total_sql = "
-    SELECT 
-        SUM(
-            (bf.price * c.quantity) +
-            IFNULL(a.price, 0) +
-            IFNULL(b.price, 0)
-        ) AS total_amount
-    FROM cart c
-    LEFT JOIN basefood bf ON c.basefood_id = bf.basefood_id
-    LEFT JOIN addons a ON c.addon_id = a.addon_id
-    LEFT JOIN beverage b ON c.beverage_id = b.beverage_id
-    WHERE c.user_id = ?
-";
-$total_stmt = mysqli_prepare($dbcon, $total_sql);
-mysqli_stmt_bind_param($total_stmt, "i", $user_id);
-mysqli_stmt_execute($total_stmt);
-$total_result = mysqli_stmt_get_result($total_stmt);
-$total_row = mysqli_fetch_assoc($total_result);
-$total = $total_row['total_amount'] ?? 0.00;
+$cart = $input['cart'];
+$totalAmount = floatval($input['total_amount']);
 
-// 3. Insert into orders table
-$order_sql = "INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status, created_at, updated_at)
-              VALUES (?, ?, ?, 'Pending', 'Pending', NOW(), NOW())";
-$order_stmt = mysqli_prepare($dbcon, $order_sql);
-mysqli_stmt_bind_param($order_stmt, "ids", $user_id, $total, $payment_method);
-mysqli_stmt_execute($order_stmt);
-$order_id = mysqli_insert_id($dbcon);
+// For simplicity, payment_method and status hardcoded
+$paymentMethod = 'Cash on Delivery';
+$paymentStatus = 'Pending';
+$orderStatus = 'Pending';
 
-// 4. Get cart items for order_items insertion
-$cart_items_sql = "SELECT * FROM cart WHERE user_id = ?";
-$cart_items_stmt = mysqli_prepare($dbcon, $cart_items_sql);
-mysqli_stmt_bind_param($cart_items_stmt, "i", $user_id);
-mysqli_stmt_execute($cart_items_stmt);
-$cart_items_result = mysqli_stmt_get_result($cart_items_stmt);
+// Start transaction
+mysqli_begin_transaction($dbcon);
 
-while ($item = mysqli_fetch_assoc($cart_items_result)) {
-    $basefood_id = $item['basefood_id'];
-    $addon_id = $item['addon_id'];
-    $beverage_id = $item['beverage_id'];
-    $quantity = $item['quantity'];
+try {
+    // Insert order
+    $stmt = $dbcon->prepare("INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("idsss", $userId, $totalAmount, $paymentMethod, $paymentStatus, $orderStatus);
+    $stmt->execute();
 
-    // You can calculate price per item here if needed (optional)
-    // For now, just insert details into order_items
+    $orderId = $stmt->insert_id;
+    $stmt->close();
 
-    $oi_sql = "INSERT INTO order_items (order_id, food_id, addon_id, beverage_id, quantity, price, created_at, updated_at)
-               VALUES (?, ?, ?, ?, ?, 0.00, NOW(), NOW())";
-    $oi_stmt = mysqli_prepare($dbcon, $oi_sql);
-    mysqli_stmt_bind_param($oi_stmt, "iiiii", $order_id, $basefood_id, $addon_id, $beverage_id, $quantity);
-    mysqli_stmt_execute($oi_stmt);
+    // Insert order items
+    foreach ($cart as $item) {
+        $categoryId = intval($item['category_id']);
+        $quantity = intval($item['qty']);
+        $price = floatval($item['price']);
+        $basefoodId = null;
+        $beverageId = null;
+
+        // Decide if basefood or beverage depending on category_id
+        if ($categoryId === 1) {
+            $basefoodId = intval($item['id']);
+        } elseif ($categoryId === 3) {
+            $beverageId = intval($item['id']);
+        } else {
+            // Handle other categories if needed or skip
+        }
+
+        $stmt = $dbcon->prepare("INSERT INTO order_items (order_id, basefood_id, beverage_id, quantity, price) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("iiiid", $orderId, $basefoodId, $beverageId, $quantity, $price);
+        $stmt->execute();
+
+        $orderItemId = $stmt->insert_id;
+        $stmt->close();
+
+        // Insert addons if exist
+        if (isset($item['addons']) && is_array($item['addons'])) {
+            foreach ($item['addons'] as $addon) {
+                $addonId = intval($addon['id']);
+                $addonPrice = floatval($addon['price']);
+
+                $stmt = $dbcon->prepare("INSERT INTO order_item_addons (order_item_id, addon_id, price) VALUES (?, ?, ?)");
+                $stmt->bind_param("iid", $orderItemId, $addonId, $addonPrice);
+                $stmt->execute();
+                $stmt->close();
+            }
+        }
+    }
+
+    mysqli_commit($dbcon);
+
+    echo json_encode(['success' => true, 'order_id' => $orderId]);
+} catch (Exception $e) {
+    mysqli_rollback($dbcon);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
-
-// 5. Clear cart
-$clear_sql = "DELETE FROM cart WHERE user_id = ?";
-$clear_stmt = mysqli_prepare($dbcon, $clear_sql);
-mysqli_stmt_bind_param($clear_stmt, "i", $user_id);
-mysqli_stmt_execute($clear_stmt);
-
-// 6. Redirect or confirm
-echo "<script>alert('Your order has been placed successfully!'); window.location.href='orders.php';</script>";
-exit();
-?>

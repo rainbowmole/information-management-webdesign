@@ -1,20 +1,12 @@
 <?php
-//rendering menu items
+// rendering menu items
 include 'mysqli_connect.php';
 
-function renderCards($result, $type) {
+function renderCards($result, $idField) {
     while ($row = $result->fetch_assoc()) {
-        // Use only the ID relevant to the item type
-        $id = null;
-        if ($type === 'basefood_id') {
-            $id = $row['basefood_id'];
-        } elseif ($type === 'addon_id') {
-            $id = $row['addon_id'];
-        } elseif ($type === 'beverage_id') {
-            $id = $row['beverage_id'];
-        } else {
-            $id = $row['id'] ?? null; // fallback
-        }
+        // id can be basefood_id, addon_id, or beverage_id
+        $id = $row[$idField];
+        $category_id = $row['category_id'];
 
         echo '<div class="card" onclick="openModal(' .
             htmlspecialchars(json_encode($row['name'])) . ',' .
@@ -22,7 +14,7 @@ function renderCards($result, $type) {
             htmlspecialchars(json_encode($row['description'] ?? '')) . ',' .
             htmlspecialchars(json_encode($row['price'])) . ',' .
             htmlspecialchars(json_encode($id)) . ',' .
-            "'" . ($type === 'basefood_id' ? 'basefood' : ($type === 'beverage_id' ? 'beverage' : 'addon')) . "'" .
+            htmlspecialchars(json_encode((int)$category_id)) .
         ')">';
         echo '<img src="' . htmlspecialchars($row['image_url']) . '" alt="' . htmlspecialchars($row['name']) . '">';
         echo '<div class="card-content">';
@@ -38,26 +30,37 @@ $type = $_GET['id'] ?? 'basefood_id';
 switch ($type) {
     case 'addon_id':
         $query = "
-            SELECT MIN(addon_id) as addon_id, name, price, MIN(image_url) as image_url
-            FROM addons
-            WHERE is_available = 1 and price > 0
-            GROUP BY name, price
-            ORDER BY name
+            SELECT a.addon_id, a.name, a.price, a.image_url, a.category_id
+            FROM addons a
+            INNER JOIN (
+                SELECT name, price, category_id, MIN(addon_id) AS min_id
+                FROM addons
+                WHERE is_available = 1 AND price > 0
+                GROUP BY name, price, category_id
+            ) sub ON a.name = sub.name 
+                AND a.price = sub.price
+                AND a.category_id = sub.category_id
+                AND a.addon_id = sub.min_id
+            WHERE a.is_available = 1 AND a.price > 0
+            ORDER BY a.name;
         ";
+        $idField = 'addon_id';
         break;
     case 'beverage_id':
-        $query = "SELECT * FROM beverages WHERE is_available = 1";
+        $query = "SELECT beverage_id, category_id, name, price, image_url FROM beverages WHERE is_available = 1";
+        $idField = 'beverage_id';
         break;
     case 'basefood_id':
     default:
-        $query = "SELECT * FROM base_foods WHERE is_available = 1";
+        $query = "SELECT basefood_id, category_id, name, description, price, image_url FROM base_foods WHERE is_available = 1";
+        $idField = 'basefood_id';
         break;
 }
 
 $result = mysqli_query($dbcon, $query);
 
 if ($result && $result->num_rows > 0) {
-    renderCards($result, $type);
+    renderCards($result, $idField);
 } else {
     echo "<p>No items found for this menu.</p>";
 }
