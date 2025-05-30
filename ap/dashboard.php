@@ -38,19 +38,13 @@
                 ?>
             </span>
         </li>
-        <li>
-            <i class='bx bxs-group' ></i>
-            <span class="text">
-                <h3>2834</h3>
-                <p>Visitors</p>
-            </span>
-        </li>
+        
         <li>
             <i class='bx bxs-dollar-circle' ></i>
             <span class="text">
                 <?php
                 $fetch_sales = mysqli_fetch_assoc($result_sales);
-                $total_sales = htmlspecialchars($fetch_sales["total_sales"]);
+                $total_sales = htmlspecialchars($fetch_sales["total_sales"] !== null ? $fetch_sales["total_sales"] : 0);
                 echo "
                 <h3>$total_sales</h3>
                 <p>Total Sales</p>
@@ -75,8 +69,6 @@
         <div class="order">
             <div class="head">
                 <h3>Recent Orders</h3>
-                <i class='bx bx-search' ></i>
-                <i class='bx bx-filter' ></i>
             </div>
             <table>
                 <thead>
@@ -115,34 +107,6 @@
                 </tbody>
             </table>
         </div>
-        <div class="todo">
-            <div class="head">
-                <h3>Todos</h3>
-                <i class='bx bx-plus' ></i>
-                <i class='bx bx-filter' ></i>
-            </div>
-            <ul class="todo-list">
-                <li class="completed">
-                    <p>Todo List</p>
-                    <i class='bx bx-dots-vertical-rounded' ></i>
-                </li>
-                <li class="completed">
-                    <p>Todo List</p>
-                    <i class='bx bx-dots-vertical-rounded' ></i>
-                </li>
-                <li class="not-completed">
-                    <p>Todo List</p>
-                    <i class='bx bx-dots-vertical-rounded' ></i>
-                </li>
-                <li class="completed">
-                    <p>Todo List</p>
-                    <i class='bx bx-dots-vertical-rounded' ></i>
-                </li>
-                <li class="not-completed">
-                    <p>Todo List</p>
-                    <i class='bx bx-dots-vertical-rounded' ></i>
-                </li>
-            </ul>
-        </div>
+       
     </div>
 </main>	

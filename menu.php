@@ -21,7 +21,7 @@
             </nav>
         
             <div class="menu-container">
-                <?php include 'render_menu_items.php'; ?> <!-- Cleaner ver To render menu items Dynamically -->
+                <?php include 'render_menu_items.php'; ?> <!-- Cleaner ver To render menu items Dynamically --> 
             </div>
 
             <!-- Dynamic Modal| For design purposes -->

@@ -4,6 +4,12 @@ error_log("Order processing started at " . date('Y-m-d H:i:s') . " for user: " .
 header('Content-Type: application/json');
 require 'mysqli_connect.php'; 
 
+//checking for session role if user or admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== "user") {
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit();
+}
+
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 

@@ -2,7 +2,7 @@
     session_start();
     //pag walang nakalogin,
     //ibato sa index.php
-    if(!isset($_SESSION['user_id'])){
+    if(!isset($_SESSION['role'])){
         header("Location:index.php");
         exit();
     }

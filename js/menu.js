@@ -1,11 +1,11 @@
 let qty = 1;
-let addonPriceMap = new Map();
-let dynamicShippingFee = 0;
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let addonPriceMap = new Map(); //new update
+let dynamicShippingFee = 0; //new update
+let cart = JSON.parse(localStorage.getItem('cart')) || []; //new update
 
 function openModal(title, image, description, price, id, category_id) { 
-    document.getElementById('modalId').value = id;
-    document.getElementById('modalCategoryId').value = category_id;
+    document.getElementById('modalId').value = id; //new update
+    document.getElementById('modalCategoryId').value = category_id; //new update
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalImage').src = image;
     document.getElementById('modalDesc').innerText = description;
@@ -16,10 +16,10 @@ function openModal(title, image, description, price, id, category_id) {
     const checklist = document.getElementById('checklist');
     checklist.innerHTML = '<em style="white-space: nowrap;">No add-ons available</em>';
 
-    console.log('category_id:', category_id, typeof category_id);
+    console.log('category_id:', category_id, typeof category_id); //error checking lang
 
-    // Fetch dynamic add-ons from the same file
-    if (category_id === 1) {
+    // Fetch dynamic add-ons from the same file (new update)
+    if (category_id === 1) { //<---------------if the category_id is 1 which is yung basefood natin it will display the addons para to sa menu cards (new update)
         checklist.innerHTML = 'Loading add-ons...';
 
         fetch(`fetch_addons.php?category_id=${category_id}&basefood_id=${id}`) 
@@ -82,7 +82,7 @@ if (cartBtn) {
 function showCart() {
     cartModal.style.display = "flex";
 
-    fetch('fetch_shipping_fee.php')
+    fetch('fetch_shipping_fee.php') //get the shipping fee of the user from the fetch_shipping_fee.php file
         .then(res => res.json())
         .then(data => {
             dynamicShippingFee = parseFloat(data.shipping_fee || 0);
@@ -112,6 +112,7 @@ if (closeCartBtn) {
     closeCartBtn.addEventListener("click", closeCart);
 }
 
+//add to cart function
 function addToCart() {
     closeModal();
 
@@ -119,8 +120,9 @@ function addToCart() {
     const emptyText = cartItems.querySelector('p');
     if (emptyText) emptyText.remove();
 
-    const id = parseInt(document.getElementById('modalId').value);
-    const category_id = parseInt(document.getElementById('modalCategoryId').value); // ✅ Fix category ID
+    //getting the data for the item
+    const id = parseInt(document.getElementById('modalId').value); //(new update)
+    const category_id = parseInt(document.getElementById('modalCategoryId').value); //(new update)
     const name = document.getElementById('modalTitle').innerText;
     const price = parseFloat(document.getElementById('modalPrice').innerText);
     const quantity = parseInt(document.getElementById('qtyValue').innerText);
@@ -141,11 +143,12 @@ function addToCart() {
     const item = document.createElement('div');
     item.className = 'cart-item';
 
-    item.dataset.id = id; // ✅ Save ID for localStorage
+    //variables of the item for the cart
+    item.dataset.id = id; 
     item.dataset.price = price;
     item.dataset.qty = quantity;
     item.dataset.addon = addonTotal;
-    item.dataset.categoryId = category_id; // ✅ Set fixed category ID
+    item.dataset.categoryId = category_id; 
 
     item.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -161,19 +164,21 @@ function addToCart() {
     cartItems.appendChild(item);
     updateCartTotal();
 
+    //to notify the user that the itemm is successfully added to the cart
     const notifContainer = document.getElementById('notifContainer');
     const notif = document.createElement('div');
     notif.className = 'notif';
     notif.innerText = '✅ Item added to cart!';
     notifContainer.appendChild(notif);
 
-    saveCartToLocalStorage();
+    saveCartToLocalStorage(); //save the cart to local storage
 
     setTimeout(() => {
         notif.remove();
     }, 4000);
 }
-//to save the cart items across the pages
+
+//to save the cart items across the pages, instead of using the initial plan of cart table in a database, it's better to use a local storage instead.
 function saveCartToLocalStorage() {
     const cartItems = Array.from(document.querySelectorAll('.cart-item')).map(item => ({
         id: parseInt(item.dataset.id), // ✅ Fixed line
@@ -189,6 +194,7 @@ function saveCartToLocalStorage() {
     localStorage.setItem('cart', JSON.stringify(cartItems));
 }
 
+//getting the total amount of the cart items
 function updateCartTotal() {
     const cartItems = document.querySelectorAll('.cart-item');
     let subtotal = 0;
@@ -204,11 +210,11 @@ function updateCartTotal() {
     const shipping = dynamicShippingFee || 0;
     const total = subtotal + vat + shipping;
 
-    document.getElementById('cartSubtotal').innerText = `₱${subtotal.toFixed(2)}`;
-    document.getElementById('cartVAT').innerText = `₱${vat.toFixed(2)}`;
-    document.getElementById('cartTotal').innerText = `₱${total.toFixed(2)}`;
-    //line 157
-    saveCartToLocalStorage();
+    document.getElementById('cartSubtotal').innerText = `₱${subtotal.toFixed(2)}`; //the total price of the items
+    document.getElementById('cartVAT').innerText = `₱${vat.toFixed(2)}`; //the tax for this cart
+    document.getElementById('cartTotal').innerText = `₱${total.toFixed(2)}`; //the total price of the items including tax
+
+    saveCartToLocalStorage();//saving the total amount to the local storage 
 }
 
 //for cart item
@@ -222,8 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'cart-item';
-            el.dataset.id = item.id;               // ADD THIS
-            el.dataset.categoryId = item.category_id; // ADD THIS
+            el.dataset.id = item.id;                  // (new update)
+            el.dataset.categoryId = item.category_id; // (new update)
             el.dataset.price = item.price;
             el.dataset.qty = item.qty;
             el.dataset.addon = item.addon;
@@ -255,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Failed to fetch shipping fee:', err);
             });
 
-        function updateCartTotalWithShipping(shipping) {
+        function updateCartTotalWithShipping(shipping) { //adding the shipping fee to the total
             const cartItems = document.querySelectorAll('.cart-item');
             let subtotal = 0;
 
@@ -279,6 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 //PANCHECK OUTT
+
+//the submit button that will pass the data from the local storage to the order, order_items, order_item_addons in the database
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('checkoutForm');
     if (form) {
@@ -310,8 +318,13 @@ document.getElementById('checkoutForm').addEventListener('submit', function (e) 
             localStorage.removeItem('cart');
             location.reload(); // or redirect to success page
         } else {
-            console.error(data.error || 'Unknown error');
-            alert('Checkout failed: ' + (data.error || 'Unknown error'));
+            if (data.error === 'Unauthorized') {
+                alert('You must be logged in as a user to place an order.');
+                window.location.href = 'login.php'; // manual redirect
+            } else {
+                console.error(data.error || 'Unknown error');
+                alert('Checkout failed: ' + (data.error || 'Unknown error'));
+            }
         }
     })
     .catch(err => {

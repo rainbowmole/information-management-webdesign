@@ -30,6 +30,7 @@
                 if ($currentPage === 'index.php') {
                     echo '<a href="register.php">Register</a>';
                     echo '<button id="header-loginBtn"><a href="login.php" style="color: #fff;">Login</a></button>';
+                    echo '<button id="header-Loginbtn"><a href="logout.php" style="color: #fff;">Logout</a></button>';
                 } elseif ($currentPage === 'admin.php') {
                     echo '<a href="logout.php">Logout</a>';
                 } elseif ($currentPage === 'menu.php') {
