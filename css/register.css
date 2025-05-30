@@ -2,6 +2,15 @@
     box-sizing: border-box;
 }
 
+body {
+    background-image: url("../media/register-bg.jpg");
+    background-attachment: scroll;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
 main {
     flex: 1;
     max-width: 100%;
@@ -13,17 +22,11 @@ main {
     min-height: 90vh;
 }
 
-#register-page,
-#success-page {
+#register-page {
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 0 50px;
-    background-image: url("../media/register-bg.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
     max-width: 100%;
     gap: 20px;
 }
@@ -34,15 +37,14 @@ main {
     align-items: left;
     margin: 0;
     padding: 23px;
-    width: 25%;
-    background-color: #FFF2C6;
+    width: 30%;
+    background-color: white;
     border: 2px solid #000000;
     border-radius: 20px;
     color: #000;
     height: fit-content;
     box-shadow: 5px 10px;
 }
-
 
 #reg-form-div h2 {
     color: #000;
@@ -58,7 +60,6 @@ main {
 
 .register-inputs label {
     font-weight: bold;
-    /* margin: 5px 0; */
 }
 
 .register-inputs input[type="text"],
@@ -79,12 +80,13 @@ main {
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
-    /* border: 1px solid #000; */
+    border: 1px solid #000;
     font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .submit-button {
-    text-align: right;
+    text-align: center;
 }
 
 #submit:hover {
@@ -134,8 +136,8 @@ main {
 }
 
 .toast {
-    width: 300px;
-    height: 70px;
+    width: 220px;
+    height: 55px;
     background-color: #f8f8f8;
     font-weight: 500;
     margin: 15px 0;
@@ -146,7 +148,9 @@ main {
     transform: translateX(100%);
     animation: moveleft 0.5s linear forwards;
     border-radius: 20px;
-    overflow: hidden;   
+    overflow: hidden;
+    font-size: 0.85rem; 
+    padding: 10px;
 }
 
 @keyframes moveleft {
@@ -224,4 +228,47 @@ main {
     }
 }
 
+.input-pair {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
 
+.input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group input {
+    width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .input-pair {
+        flex-direction: column;
+    }
+}
+
+.password-field {
+    position: relative;
+    width: 100%;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 40px; /* makes space for the eye icon */
+}
+
+.toggle-eye {
+    position: absolute;
+    top: 15%;
+    right: 10px;
+    transform: translateY(-15%);
+    width: 24px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}

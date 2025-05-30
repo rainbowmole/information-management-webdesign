@@ -1,11 +1,11 @@
 <?php
-//fetch_shipping_fee
+//fetch_shipping_fee, this file is for getting the shipping fee of the user based on the location
 session_start();
 require'mysqli_connect.php';
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id']; //get the user id from the session
 
-$stmt = $dbcon->prepare("SELECT address FROM users WHERE user_id = ?");
+$stmt = $dbcon->prepare("SELECT address FROM users WHERE user_id = ?"); //get the address of the user in session
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -14,7 +14,7 @@ $address = strtolower($user['address']);
 
 $shipping_fee = 150;
 
-$query = "SELECT shipping_fee, location_keywords FROM shipping_zones";
+$query = "SELECT shipping_fee, location_keywords FROM shipping_zones"; //get the shipping fee and location keywords from the database
 $result = mysqli_query($dbcon, $query);
 
 while ($row = $result->fetch_assoc()) {

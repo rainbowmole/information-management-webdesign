@@ -69,4 +69,74 @@ nav a {
     cursor: pointer;
     background-color: var(--orange);
 }
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1em;
+    }
+
+    .header-div {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 0.5em;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        width: 100%;
+    }
+
+    nav a {
+        font-size: 1rem;
+        padding: 0.5em 0;
+    }
+
+    #header-loginBtn {
+        font-size: 1rem;
+        padding: 0.5em 1em;
+        width: fit-content;
+    }
+
+    #cartBtn img {
+        width: 24px;
+        height: 24px;
+    }
+
+    #menu-toggle {
+        display: block;
+        position: absolute;
+        top: 1.2em;
+        right: 1.5em;
+        z-index: 1100;
+    }
+
+    .nav-container {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #fff;
+        padding: 1em;
+        border-top: 1px solid #ccc;
+    }
+
+    .nav-container.show {
+        display: flex;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    nav a, #header-loginBtn {
+        width: 100%;
+        text-align: left;
+    }
+}
+
 /* end of header =======================================================*/

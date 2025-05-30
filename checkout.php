@@ -1,8 +1,8 @@
 <?php
 session_start();
-error_log("Order processing started at " . date('Y-m-d H:i:s') . " for user: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'none'));
+error_log("Order processing started at " . date('Y-m-d H:i:s') . " for user: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'none')); //error message
 header('Content-Type: application/json');
-require 'mysqli_connect.php'; // your connection file
+require 'mysqli_connect.php'; 
 
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
@@ -14,14 +14,14 @@ if (!$input || !isset($input['cart']) || !isset($input['total_amount'])) {
 
 $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 if ($userId === null) {
-    echo json_encode(['success' => false, 'error' => 'User not logged in']);
+    echo json_encode(['success' => false, 'error' => 'User not logged in']); //check if the user is logged in
     exit;
 }
 
-$cart = $input['cart'];
-$totalAmount = floatval($input['total_amount']);
+$cart = $input['cart']; //get the cart array from the local storage 
+$totalAmount = floatval($input['total_amount']); //get the total amount from the local storage
 
-// For simplicity, payment_method and status hardcoded
+// payment_method and status hardcoded
 $paymentMethod = 'Cash on Delivery';
 $paymentStatus = 'Pending';
 $orderStatus = 'Pending';
