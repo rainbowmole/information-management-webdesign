@@ -34,7 +34,7 @@
                         <td>₱<?= number_format($row['price'], 2) ?></td>
                         <td><?= $row['is_available'] ? 'Yes' : 'No' ?></td>
                         <td>
-                            <a href="edit_product_form.php?id=<?= $row['basefood_id'] ?>">Edit</a> |
+                            <a href="edit_product_form.php?id=<?= $row['basefood_id'] ?>&category=base_foods">Edit</a> |
                             <a href="#" onclick="event.preventDefault(); openDeleteModal('<?= $row['basefood_id'] ?>', 'base_foods')">Delete</a>
                         </td>
                     </tr>
@@ -66,7 +66,7 @@
                         <td>₱<?= number_format($row['price'], 2) ?></td>
                         <td><?= $row['is_available'] ? 'Yes' : 'No' ?></td>
                         <td>
-                            <a href="edit_product_form.php?id=<?= $row['beverage_id'] ?>">Edit</a> |
+                            <a href="edit_product_form.php?id=<?= $row['beverage_id'] ?>&category=beverages">Edit</a> |
                             <a href="#" onclick="event.preventDefault(); openDeleteModal('<?= $row['beverage_id'] ?>', 'beverages')">Delete</a>
                         </td>
                     </tr>
@@ -98,7 +98,7 @@
                         <td>₱<?= number_format($row['price'], 2) ?></td>
                         <td><?= $row['is_available'] ? 'Yes' : 'No' ?></td>
                         <td>
-                            <a href="edit_product_form.php?id=<?= $row['addon_id'] ?>">Edit</a> |
+                            <a href="edit_product_form.php?id=<?= $row['addon_id'] ?>&category=addons">Edit</a> |
                             <a href="#" onclick="event.preventDefault(); openDeleteModal('<?= $row['addon_id'] ?>', 'addons')">Delete</a>
                         </td>
                     </tr>

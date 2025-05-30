@@ -18,7 +18,7 @@
 
     <!-- for box info ng total orders -->
     <?php
-    $q_orders = "SELECT COUNT(order_id) AS total_orders FROM orders WHERE payment_status = 'Pending' or order_status in ('Pending', 'Preparing', 'On the Way')";
+    $q_orders = "SELECT COUNT(order_id) AS total_orders FROM orders WHERE payment_status = 'Pending' and order_status in ('Pending', 'Preparing', 'On the Way')";
     $result_orders = mysqli_query($dbcon, $q_orders);
 
     $q_sales = "SELECT SUM(total_amount) AS total_sales FROM orders WHERE payment_status = 'Paid' or order_status = 'Delivered'";
